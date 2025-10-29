@@ -16,7 +16,7 @@ PROBLEM_SAVE_PATH = os.path.join(PROJECT_ROOT, "data/verify_problems/")
 
 # -------------------------- 2. 预处理参数 --------------------------
 # 每批次行数（建议1000-2000，避免LLM上下文超量）
-BATCH_SIZE = 1000
+BATCH_SIZE = 100
 # 过滤无效字段：长度小于2的字段会被删除（如单字母“A”）
 MIN_FIELD_LENGTH = 2
 
@@ -32,7 +32,7 @@ OPENAI_API_KEY = "sk-你的OPENAI API Key"
 OPENAI_MODEL = "gpt-4o-mini"
 
 # DeepSeek配置
-DEEPSEEK_API_KEY = "sk-cad80889abd343509faab8cdc68956e4"
+DEEPSEEK_API_KEY = "sk-cad80889abd343599faab8cdc69956e4"
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 DEEPSEEK_MODEL = "deepseek-chat"
 
