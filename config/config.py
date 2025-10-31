@@ -56,18 +56,18 @@ LLM_TEMPERATURE = 0.1
 
 # OpenAI配置
 # 使用辅助函数获取环境变量
-OPENAI_API_KEY = get_env_variable("OPENAI_API_KEY", "sk-你的OPENAI API Key")
-OPENAI_MODEL = get_env_variable("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_API_KEY = get_env_variable("OPENAI_API_KEY")
+OPENAI_MODEL = get_env_variable("OPENAI_MODEL")
 
 # DeepSeek配置
 # 使用辅助函数获取环境变量
-DEEPSEEK_API_KEY = get_env_variable("DEEPSEEK_API_KEY", "sk-cad80889abd343599faab8cdc69956e4")
-DEEPSEEK_BASE_URL = get_env_variable("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-DEEPSEEK_MODEL = get_env_variable("DEEPSEEK_MODEL", "deepseek-chat")
+DEEPSEEK_API_KEY = get_env_variable("DEEPSEEK_API_KEY")
+DEEPSEEK_BASE_URL = get_env_variable("DEEPSEEK_BASE_URL")
+DEEPSEEK_MODEL = get_env_variable("DEEPSEEK_MODEL")
 
 # Local LLM配置
-LOCAL_LLM_URL = get_env_variable("LOCAL_LLM_URL", "http://192.168.5.85:8000/v1/chat/completions")
-LOCAL_LLM_MODEL = get_env_variable("LOCAL_LLM_MODEL", "Qwen2.5-72B-Instruct")
+LOCAL_LLM_URL = get_env_variable("LOCAL_LLM_URL")
+LOCAL_LLM_MODEL = get_env_variable("LOCAL_LLM_MODEL")
 LOCAL_LLM_MAX_TOKENS = BATCH_SIZE*8  # 单次响应的最大令牌数（根据需求调整，避免过长响应）
 
 # -------------------------- 4. 验证参数 --------------------------
