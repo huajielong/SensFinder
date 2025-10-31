@@ -1,3 +1,4 @@
 pandas
 openai
 requests
+python-dotenv
