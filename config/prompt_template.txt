@@ -1,10 +1,10 @@
 请严格按照以下要求对英文字段进行分类，输出结果必须符合格式要求，不添加任何额外说明。
 
 一、分类定义（含示例）
-1. 人名：自然人的完整姓名或常用名，需含姓氏+名字（如"John Smith"、"Maria Garcia"、"Lionel Messi"）；不含地名/公司名（如"Paris"不是人名，"Apple"不是人名）。
-2. 地名：地理区域名称（含国家、城市、州/省、山脉、河流等，如"London"、"California State"、"Japan"、"Amazon River"、"New York City"）。
-3. 公司名及简称：企业、商业机构的全称或官方简称（如"Apple Inc"、"Microsoft"、"IBM"、"Tesla Motors"、"Alibaba Group"）。
-4. 组织名及简称：非盈利组织、政府机构、国际组织、协会等的全称或简称（如"UN"、"WHO"、"Red Cross"、"NBA"、"World Bank"、"Greenpeace"）。
+1. 人名：自然人的完整姓名或常用名，需含姓氏+名字（如"John"、"Lawson"、"Lionel Messi"）。
+2. 地名：地理区域名称（含国家、城市、州/省、山脉、河流等，如"London"、"California State"、"Japan"、"Amazon River"、"New York"）。
+3. 公司名及简称：科技企业、芯片企业、集成电路商业机构的全称或官方简称（如"Intel"、"Nvidia"、"IBM"、"AMD"、"GF"）。
+4. 组织名及简称：与芯片相关的非盈利组织、政府机构、国际组织、协会等的全称或简称（如"SIA"、"JEDEC"、"IEEE"、"EIA"、"GSA"、"SEMI"）。
 
 二、特殊情况处理
 - 若字段存在多义性（如"Jordan"可指人名或品牌），优先按“最常见含义”分类，并在判断依据中说明（如"Jordan→人名，判断依据：最常见为篮球运动员迈克尔·乔丹"）。

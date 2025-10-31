@@ -11,14 +11,24 @@ def verify_results():
         os.makedirs(PROBLEM_SAVE_PATH)
         print(f"已创建问题字段文件夹：{PROBLEM_SAVE_PATH}")
 
-    # 2. 获取所有分类结果文件
+    # 2. 删除PROBLEM_SAVE_PATH下所有文件
+    for filename in os.listdir(PROBLEM_SAVE_PATH):
+        file_path = os.path.join(PROBLEM_SAVE_PATH, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+                print(f"已删除文件：{file_path}")
+        except Exception as e:
+            print(f"删除文件 {file_path} 失败！错误：{e}")
+
+    # 3. 获取所有分类结果文件
     result_files = [f for f in os.listdir(CLASSIFY_SAVE_PATH) if f.startswith("result_") and f.endswith(".csv")]
     if not result_files:
         print(f"未找到分类结果文件！请先运行 02_llm_classify.py")
         return
     print(f"共找到{len(result_files)}个分类结果文件，开始验证...")
 
-    # 3. 逐个文件验证
+    # 4. 逐个文件验证
     all_problems = []
     for result_file in result_files:
         result_path = os.path.join(CLASSIFY_SAVE_PATH, result_file)
@@ -55,7 +65,7 @@ def verify_results():
             all_problems.append(batch_problems)
             print(f"  该批次发现{len(batch_problems)}个问题字段")
 
-    # 4. 保存所有问题字段
+    # 5. 保存所有问题字段
     if all_problems:
         all_problems_df = pd.concat(all_problems, ignore_index=True)
         # 只保留关键列（便于人工复核）

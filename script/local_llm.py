@@ -1,5 +1,6 @@
 import requests
 import logging
+import time
 from typing import List, Dict, Optional
 
 # 使用包导入方式
@@ -47,8 +48,12 @@ class LocalLLM:
         }
         try:
             logger.debug("Sending request to LLM service with data: %s", data)
-            response = requests.post(self.url, headers=self.headers, json=data)
+            start_time = time.time()
+            response = requests.post(self.url, headers=self.headers, json=data, timeout=600)
             response.raise_for_status()
+            end_time = time.time()
+            process_time = end_time - start_time
+            logger.info("LLM request completed in %.2f seconds", process_time)
             result = response.json()["choices"][0]["message"]["content"]
             logger.debug("Received response from LLM service: %s", result)
             return result

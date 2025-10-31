@@ -9,8 +9,18 @@ def preprocess_data():
     if not os.path.exists(BATCH_SAVE_PATH):
         os.makedirs(BATCH_SAVE_PATH)
         print(f"已创建批次文件保存文件夹：{BATCH_SAVE_PATH}")
+    
+    # 2. 删除BATCH_SAVE_PATH下所有文件
+    for filename in os.listdir(BATCH_SAVE_PATH):
+        file_path = os.path.join(BATCH_SAVE_PATH, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+                print(f"已删除文件：{file_path}")
+        except Exception as e:
+            print(f"删除文件 {file_path} 失败！错误：{e}")
 
-    # 2. 读取原始文本文件（递归处理目录下所有文件）
+    # 3. 读取原始文本文件（递归处理目录下所有文件）
     try:
         raw_fields = []
         total_files = 0
@@ -50,7 +60,7 @@ def preprocess_data():
         print(f"请检查 config.py 中 RAW_FILES_PATH 是否正确")
         return
 
-    # 3. 清理无效字段（长度＜MIN_FIELD_LENGTH、纯特殊字符）
+    # 4. 清理无效字段（长度＜MIN_FIELD_LENGTH、纯特殊字符）
     import re
     # 过滤规则：长度≥MIN_FIELD_LENGTH + 至少含1个字母（排除纯数字/特殊字符）
     valid_fields = []
@@ -59,11 +69,11 @@ def preprocess_data():
             valid_fields.append(field)
     print(f"清理后有效字段数：{len(valid_fields)}（删除{len(raw_fields)-len(valid_fields)}个无效字段）")
 
-    # 4. 去重（确保无重复字段）
+    # 5. 去重（确保无重复字段）
     valid_fields = list(set(valid_fields))
     print(f"去重后最终字段数：{len(valid_fields)}")
 
-    # 5. 分批次保存为CSV
+    # 6. 分批次保存为CSV
     total_batches = len(valid_fields) // BATCH_SIZE + 1
     for batch_idx in range(total_batches):
         # 计算当前批次的字段范围

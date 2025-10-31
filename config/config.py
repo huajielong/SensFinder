@@ -16,7 +16,7 @@ PROBLEM_SAVE_PATH = os.path.join(PROJECT_ROOT, "data/verify_problems/")
 
 # -------------------------- 2. 预处理参数 --------------------------
 # 每批次行数（建议1000-2000，避免LLM上下文超量）
-BATCH_SIZE = 100
+BATCH_SIZE = 1000
 # 过滤无效字段：长度小于2的字段会被删除（如单字母“A”）
 MIN_FIELD_LENGTH = 2
 
@@ -28,11 +28,13 @@ CURRENT_LLM_SERVICE = "DEEPSEEK"  # 这里可以轻松切换模型服务
 LLM_TEMPERATURE = 0.1
 
 # OpenAI配置
-OPENAI_API_KEY = "sk-你的OPENAI API Key"
+# 建议从环境变量读取API密钥，避免硬编码
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "sk-你的OPENAI API Key")  # 替换为你的API Key或设置环境变量
 OPENAI_MODEL = "gpt-4o-mini"
 
 # DeepSeek配置
-DEEPSEEK_API_KEY = "sk-cad80889abd343599faab8cdc69956e4"
+# 建议从环境变量读取API密钥，避免硬编码
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "sk-cad80889abd343599faab8cdc69956e4")  # 替换为你的API Key或设置环境变量
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 DEEPSEEK_MODEL = "deepseek-chat"
 

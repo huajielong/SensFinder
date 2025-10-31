@@ -1,3 +1,0 @@
-source_batch,raw_text,category,confidence,reason,problem_type
-result_batch_1.csv,Los,未分类,70,不完整地名片段（如洛杉矶部分）,低置信度
-result_batch_1.csv,San,未分类,70,不完整地名片段（如旧金山部分）,低置信度

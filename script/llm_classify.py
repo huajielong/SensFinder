@@ -3,6 +3,7 @@ import os
 import concurrent.futures
 import time
 import random
+import glob
 from openai import OpenAI
 
 # 使用正确的包导入方式
@@ -13,6 +14,83 @@ from config import (
     DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL,
 )
 from script.local_llm import LocalLLM
+
+# 合并分类结果文件的函数
+def merge_classification_results():
+    """
+    合并data/classify_results目录下的所有CSV文件到一个总表中，并按category字段排序
+    结果保存到data/merged_results.csv
+    """
+    # 使用相对路径，避免硬编码
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    input_dir = os.path.join(project_root, 'data', 'classify_results')
+    output_file = os.path.join(project_root, 'data', 'merged_results.csv')
+    
+    print(f"\n开始合并分类结果文件...")
+    
+    # 获取所有CSV文件
+    csv_files = glob.glob(os.path.join(input_dir, '*.csv'))
+    
+    if not csv_files:
+        print(f"没有找到CSV文件在目录: {input_dir}")
+        return
+    
+    print(f"找到 {len(csv_files)} 个CSV文件进行合并...")
+    
+    # 初始化一个空的DataFrame
+    all_data = pd.DataFrame()
+    
+    # 读取并合并所有CSV文件
+    for file in csv_files:
+        try:
+            # 读取单个CSV文件
+            df = pd.read_csv(file)
+            
+            # 添加源文件信息
+            df['source_file'] = os.path.basename(file)
+            
+            # 合并到总DataFrame
+            all_data = pd.concat([all_data, df], ignore_index=True)
+            
+        except Exception as e:
+            print(f"处理文件 {file} 时出错: {str(e)}")
+    
+    # 检查是否成功合并了数据
+    if all_data.empty:
+        print("警告: 没有成功合并任何数据!")
+        return
+    
+    print(f"合并完成! 总数据行数: {len(all_data)}")
+    
+    # 按category字段排序
+    if 'category' in all_data.columns:
+        all_data = all_data.sort_values(by='category', ignore_index=True)
+        print("已按 category 字段排序")
+    else:
+        print("警告: 数据中没有 'category' 字段，无法排序")
+    
+    # 保存合并后的数据
+    try:
+        # 确保输出目录存在
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        
+        all_data.to_csv(output_file, index=False, encoding='utf-8-sig')
+        print(f"合并结果已保存到: {output_file}")
+        
+        # 显示一些基本统计信息
+        print("\n数据统计信息:")
+        print(f"总列数: {len(all_data.columns)}")
+        print(f"总行数: {len(all_data)}")
+        
+        if 'category' in all_data.columns:
+            print("\nCategory 分布:")
+            category_counts = all_data['category'].value_counts()
+            print(category_counts)
+            
+            print(f"\n唯一 category 数量: {len(category_counts)}")
+            
+    except Exception as e:
+        print(f"保存文件时出错: {str(e)}")
 
 # 加载LLM提示词模板
 def load_prompt_template():
@@ -89,6 +167,8 @@ def classify_single_batch(batch_file_path, prompt_template):
             for line in result_lines:
                 # 按"\t"分割（严格匹配输出格式）
                 parts = line.split("\t")
+                if len(parts) == 1:
+                    parts = line.split("\\t")
                 if len(parts) == 4:
                     classify_data.append({
                         "raw_text": parts[0].strip(),
@@ -99,9 +179,9 @@ def classify_single_batch(batch_file_path, prompt_template):
             # 合并原始数据与分类结果
             result_df = pd.merge(batch_df, pd.DataFrame(classify_data), on="raw_text", how="left")
             
-            # 过滤掉未分类的条目
-            filtered_df = result_df[result_df["category"] != "未分类"].copy()
-            print(f"过滤掉未分类条目，原记录数: {len(result_df)}, 过滤后记录数: {len(filtered_df)}")
+            # 过滤掉未分类、无法识别和空分类的条目
+            filtered_df = result_df[(~result_df["category"].str.contains("未分类|无法识别", na=False)) & (result_df["category"].notna()) & (result_df["category"].str.strip() != "")].copy()
+            print(f"过滤掉未分类、无法识别和空分类条目，原记录数: {len(result_df)}, 过滤后记录数: {len(filtered_df)}")
             
             return filtered_df
             
@@ -121,19 +201,29 @@ def batch_classify():
         os.makedirs(CLASSIFY_SAVE_PATH)
         print(f"已创建分类结果文件夹：{CLASSIFY_SAVE_PATH}")
 
-    # 2. 加载Prompt模板
+    # 2. 删除CLASSIFY_SAVE_PATH下所有文件
+    for filename in os.listdir(CLASSIFY_SAVE_PATH):
+        file_path = os.path.join(CLASSIFY_SAVE_PATH, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+                print(f"已删除文件：{file_path}")
+        except Exception as e:
+            print(f"删除文件 {file_path} 失败！错误：{e}")
+
+    # 3. 加载Prompt模板
     prompt_template = load_prompt_template()
     if not prompt_template:
         return
 
-    # 3. 获取所有批次文件（仅CSV）
+    # 4. 获取所有批次文件（仅CSV）
     batch_files = [f for f in os.listdir(BATCH_SAVE_PATH) if f.endswith(".csv")]
     if not batch_files:
         print(f"未找到批次文件！请先运行script/data_preprocess.py")
         return
     print(f"共找到{len(batch_files)}个批次文件，开始分类...")
 
-    # 4. 定义单个批次处理函数（用于多线程）
+    # 5. 定义单个批次处理函数（用于多线程）
     def process_batch(batch_file):
         batch_path = os.path.join(BATCH_SAVE_PATH, batch_file)
         print(f"线程 {batch_file} 开始处理...")
@@ -155,7 +245,7 @@ def batch_classify():
         print(f"已保存{result_filename}")
         return True
     
-    # 5. 使用线程池并行处理所有批次
+    # 6. 使用线程池并行处理所有批次
     # 控制并发请求数量，避免服务过载
     # 根据不同LLM服务设置合理的最大并发数
     service_concurrency_limit = {
@@ -190,8 +280,14 @@ def batch_classify():
                 print(f"处理{batch_file}时发生异常：{e}")
                 failed_count += 1
 
+    
     print(f"多线程处理完成！成功：{success_count} 个批次，失败：{failed_count} 个批次")
     print(f"结果保存在：{CLASSIFY_SAVE_PATH}")
+    
+    # 合并所有分类结果文件
+    merge_classification_results()
+
+
 
 # 执行批量分类
 if __name__ == "__main__":
