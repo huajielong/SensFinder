@@ -1,4 +1,158 @@
-# SensFinder
+# SensFinder - 敏感信息识别系统
+
+## 项目概述
+SensFinder是一个强大的敏感信息识别系统，基于LLM技术自动识别和分类各类敏感信息，包括人名、地名、公司名、组织名、产品技术名等。系统采用模块化设计，提供从数据预处理、LLM分类到结果验证的完整解决方案。
+
+## 系统架构
+
+### 整体架构
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│                 │    │                 │    │                 │    │                 │
+│  数据预处理模块  │───>│   LLM分类模块   │───>│   结果验证模块   │───>│    输出结果     │
+│  (data_preprocess) │  │  (llm_classify)  │  │ (result_verify) │  │                 │
+│                 │    │                 │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### 主要模块
+1. **数据预处理模块**：清洗原始数据，过滤无效字段，批量保存
+2. **LLM分类模块**：调用LLM服务对预处理后的数据进行分类
+3. **结果验证模块**：验证分类结果，识别问题字段
+4. **配置管理**：集中管理系统参数和LLM配置
+
+## 快速开始
+
+### 环境要求
+- Python 3.8+
+- 相关依赖包（见requirements.txt）
+
+### 安装步骤
+1. 克隆项目
+```bash
+git clone <repository_url>
+cd SensFinder
+```
+
+2. 安装依赖
+```bash
+pip install -r requirements.txt
+```
+
+3. 配置环境变量
+创建`.env`文件，包含以下内容：
+```
+# LLM服务配置
+# 选择OPENAI、DEEPSEEK或LOCAL
+LLM_SERVICE=DEEPSEEK
+
+# DeepSeek配置
+DEEPSEEK_API_KEY=your_deepseek_api_key
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+
+# OpenAI配置
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_BASE_URL=https://api.openai.com/v1
+
+# 本地LLM配置
+LOCAL_LLM_URL=http://localhost:8000/v1/chat/completions
+```
+
+### 使用方法
+
+#### 1. 准备输入数据
+将需要分析的文本文件放入指定目录中（默认：`./data/raw`）
+
+#### 2. 运行主程序
+```bash
+python script/sens_finder.py
+```
+
+#### 3. 查看结果
+- 分类结果：`./data/classified_results.csv`
+- 问题字段：`./data/problems/all_problems.csv`
+- 日志文件：`./logs/sens_finder.log`
+
+## 配置说明
+
+### 主要配置项
+配置文件位于 `config/config.py`，主要配置包括：
+
+- **路径配置**：数据目录、日志目录、模型目录等
+- **预处理参数**：批次大小、最小字段长度等
+- **LLM配置**：服务类型、API密钥、模型参数等
+- **验证参数**：低置信度阈值、公司关键词等
+- **并发控制**：LLM请求并发数
+- **错误处理**：重试次数、重试间隔等
+
+## 项目结构
+
+```
+SensFinder/
+├── config/              # 配置目录
+│   ├── config.py        # 主要配置文件
+│   └── prompt_template.txt # 提示词模板
+├── data/                # 数据目录
+│   ├── raw/             # 原始数据
+│   ├── batch/           # 批处理数据
+│   ├── classified/      # 分类结果
+│   └── problems/        # 问题字段
+├── logs/                # 日志目录
+├── script/              # 脚本目录
+│   ├── data_preprocess.py # 数据预处理
+│   ├── llm_classify.py   # LLM分类
+│   ├── result_verify.py  # 结果验证
+│   ├── sens_finder.py    # 主程序
+│   └── local_llm*.py     # 本地LLM客户端
+├── test/                # 测试目录
+├── requirements.txt     # 依赖列表
+└── README.md            # 项目文档
+```
+
+## 测试
+
+运行测试脚本：
+```bash
+python test/test_sens_finder.py
+```
+
+## 支持的信息类型
+
+1. **人名**：自然人姓名
+2. **地名**：地理区域名称
+3. **公司名及简称**：企业名称
+4. **组织名及简称**：机构名称
+5. **产品/技术名**：产品或技术名称
+6. **邮箱地址**：电子邮件格式
+7. **电话号码**：电话号码格式
+8. **日期/时间**：日期时间信息
+
+## 错误处理与日志
+
+系统采用多级日志记录，包括：
+- 文件日志：保存到`./logs`目录
+- 控制台日志：实时显示运行状态
+
+错误处理机制包括：
+- 自动重试（指数退避）
+- 异常捕获与记录
+- 详细的错误信息输出
+
+## 性能优化
+
+- 批量处理：减少API调用次数
+- 并发控制：合理利用资源
+- 缓存机制：避免重复处理
+
+## 注意事项
+
+1. API密钥安全：请妥善保管API密钥，不要提交到代码仓库
+2. 输入数据：确保输入数据编码为UTF-8
+3. 性能调优：根据实际情况调整并发数和批次大小
+
+## License
+
+[MIT License](LICENSE)
 
 ## 项目简介
 

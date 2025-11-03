@@ -2,3 +2,7 @@ pandas
 openai
 requests
 python-dotenv
+backoff
+numpy
+matplotlib
+scikit-learn
