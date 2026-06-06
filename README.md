@@ -1,382 +1,306 @@
-# SensFinder - 敏感信息识别系统
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="v1.0"/>
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"/>
+  <img src="https://img.shields.io/badge/python-3.8+-orange" alt="Python 3.8+"/>
+  <img src="https://img.shields.io/github/stars/huajielong/SensFinder?style=social" alt="Stars"/>
+  <img src="https://img.shields.io/badge/LLM-OpenAI%20%7C%20DeepSeek%20%7C%20Local-brightgreen" alt="LLM Support"/>
+</p>
 
-## 项目概述
-SensFinder是一个强大的敏感信息识别系统，基于LLM技术自动识别和分类各类敏感信息，包括人名、地名、公司名、组织名、产品技术名等。系统采用模块化设计，提供从数据预处理、LLM分类到结果验证的完整解决方案。
+<h1 align="center">🔍 SensFinder</h1>
+<p align="center"><b>基于大语言模型的智能敏感信息识别与分类系统</b></p>
+<p align="center">
+  🛡️ 数据脱敏前检查 · 📋 数据泄露风险评估 · ✅ 合规性检查
+</p>
 
-## 系统架构
+<p align="center">
+  <a href="#-快速开始">🚀 快速开始</a> •
+  <a href="#-系统架构">🏗️ 系统架构</a> •
+  <a href="#-核心功能">⚡ 核心功能</a> •
+  <a href="#-分类标准">📊 分类标准</a> •
+  <a href="#-配置指南">⚙️ 配置指南</a> •
+  <a href="#-常见问题">❓ 常见问题</a>
+</p>
 
-### 整体架构
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│                 │    │                 │    │                 │    │                 │
-│  数据预处理模块  │───>│   LLM分类模块   │───>│   结果验证模块   │───>│    输出结果     │
-│  (data_preprocess) │  │  (llm_classify)  │  │ (result_verify) │  │                 │
-│                 │    │                 │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+---
 
-### 主要模块
-1. **数据预处理模块**：清洗原始数据，过滤无效字段，批量保存
-2. **LLM分类模块**：调用LLM服务对预处理后的数据进行分类
-3. **结果验证模块**：验证分类结果，识别问题字段
-4. **配置管理**：集中管理系统参数和LLM配置
+## 🤔 你真的清楚数据里藏了多少敏感信息吗？
 
-## 快速开始
+数据脱敏、合规检查是每个企业的必修课，但手动检查数万条文本字段几乎不可能：
+
+| 你可能遇到的痛点 | SensFinder 帮你解决 |
+|:-----------------|:--------------------|
+| ❓ 数万行文本，人工逐条检查不现实 | ✅ **自动化识别** — LLM 驱动，批量处理，分钟级完成 |
+| ❓ 人名、地名、公司名混杂，分类困难 | ✅ **智能分类** — 6 大类别精准区分，支持自定义扩展 |
+| ❓ 不同 LLM 服务切换麻烦 | ✅ **多引擎支持** — OpenAI / DeepSeek / 本地模型一键切换 |
+| ❓ 处理结果不可靠，需要人工复核 | ✅ **置信度评分** — 低置信度字段自动标记，复核有重点 |
+| ❓ 批量处理容易漏掉异常 | ✅ **多级验证** — 规则冲突检测 + 低置信度筛选，不留死角 |
+
+### 🔥 适用场景
+
+> **数据脱敏前检查** → **隐私合规审计** → **数据泄露风险评估** → **PII 发现与分类**
+
+---
+
+## 🚀 快速开始
 
 ### 环境要求
-- Python 3.8+
-- 相关依赖包（见requirements.txt）
 
-### 安装步骤
-1. 克隆项目
+| 依赖 | 版本 |
+|:-----|:----:|
+| Python | 3.8+ |
+| pandas | — |
+| openai | — |
+
+### 一键安装
+
 ```bash
-git clone <repository_url>
+# 1. 克隆项目
+git clone https://github.com/huajielong/SensFinder.git
 cd SensFinder
-```
 
-2. 安装依赖
-```bash
+# 2. 创建虚拟环境并安装依赖
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS / Linux
+# source venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
-3. 配置环境变量
-创建`.env`文件，包含以下内容：
-```
-# LLM服务配置
-# 选择OPENAI、DEEPSEEK或LOCAL
+### 配置 LLM 服务
+
+创建 `.env` 文件（或直接修改 `config/config.py`）：
+
+```ini
+# 选择服务：OPENAI / DEEPSEEK / LOCAL
 LLM_SERVICE=DEEPSEEK
 
-# DeepSeek配置
-DEEPSEEK_API_KEY=your_deepseek_api_key
+# DeepSeek 配置
+DEEPSEEK_API_KEY=sk-your-key
 DEEPSEEK_BASE_URL=https://api.deepseek.com
 
-# OpenAI配置
-OPENAI_API_KEY=your_openai_api_key
+# OpenAI 配置
+OPENAI_API_KEY=sk-your-key
 OPENAI_BASE_URL=https://api.openai.com/v1
 
-# 本地LLM配置
+# 本地 LLM 配置
 LOCAL_LLM_URL=http://localhost:8000/v1/chat/completions
 ```
 
-### 使用方法
+### 运行
 
-#### 1. 准备输入数据
-将需要分析的文本文件放入指定目录中（默认：`./data/raw`）
-
-#### 2. 运行主程序
 ```bash
 python script/sens_finder.py
 ```
 
-#### 3. 查看结果
-- 分类结果：`./data/classified_results.csv`
-- 问题字段：`./data/problems/all_problems.csv`
-- 日志文件：`./logs/sens_finder.log`
+**就是这么简单。** 程序会自动执行：数据预处理 → LLM 分类 → 结果验证 → 生成报告。
 
-## 配置说明
+---
 
-### 主要配置项
-配置文件位于 `config/config.py`，主要配置包括：
+## 🏗️ 系统架构
 
-- **路径配置**：数据目录、日志目录、模型目录等
-- **预处理参数**：批次大小、最小字段长度等
-- **LLM配置**：服务类型、API密钥、模型参数等
-- **验证参数**：低置信度阈值、公司关键词等
-- **并发控制**：LLM请求并发数
-- **错误处理**：重试次数、重试间隔等
+```
+┌─────────────────────┐    ┌─────────────────────┐    ┌─────────────────────┐
+│                     │    │                     │    │                     │
+│   数据预处理模块     │───>│    LLM 分类模块      │───>│    结果验证模块      │
+│   data_preprocess   │    │   llm_classify      │    │   result_verify     │
+│                     │    │                     │    │                     │
+│  • 清洗无效字段      │    │  • 调用 LLM 服务     │    │  • 置信度评分       │
+│  • 批量分片处理      │    │  • 智能分类打标      │    │  • 规则冲突检测     │
+│  • 去重优化          │    │  • 多线程并发        │    │  • 问题字段汇总     │
+└─────────────────────┘    └─────────────────────┘    └─────────────────────┘
+         │                          │                          │
+         └──────────────────────────┼──────────────────────────┘
+                                    ▼
+                         ┌─────────────────────┐
+                         │                     │
+                         │     输出结果         │
+                         │  • 分类结果 CSV      │
+                         │  • 问题字段报告      │
+                         │  • 详细日志          │
+                         └─────────────────────┘
+```
 
-## 项目结构
+### 模块职责
+
+| 模块 | 文件 | 核心职责 |
+|:-----|:-----|:---------|
+| **主控制** | `script/sens_finder.py` | 协调完整处理流程（预处理 → 分类 → 验证） |
+| **数据预处理** | `script/data_preprocess.py` | 清洗、去重、按批次分片 |
+| **LLM 分类** | `script/llm_classify.py` | 调用 LLM 对每个字段分类打标 |
+| **本地 LLM 客户端** | `script/local_llm_client.py` | 支持本地私有化模型接入 |
+| **结果验证** | `script/result_verify.py` | 置信度评分 + 规则冲突检测 |
+| **配置管理** | `config/config.py` | 集中管理系统参数和 LLM 配置 |
+
+---
+
+## ⚡ 核心功能
+
+| 功能 | 说明 |
+|:-----|:------|
+| 🤖 **多 LLM 支持** | OpenAI GPT、DeepSeek、本地私有化模型，一键切换 |
+| 📦 **批量处理** | 自动分片，支持大规模文本字段（单批次 1000-2000 行） |
+| 🎯 **智能分类** | 精准识别人名、地名、公司名、组织名、产品技术名等 |
+| ✅ **置信度评分** | 每个分类结果附带置信度，低分自动标记 |
+| 🔍 **结果验证** | 规则冲突检测 + 低置信度筛选，确保可靠 |
+| ⚡ **并行处理** | 多线程并发，大幅提升处理效率 |
+| 📊 **结构化输出** | CSV 格式，方便后续人工复核与集成 |
+
+---
+
+## 📊 分类标准
+
+系统将字段分为以下类别：
+
+| 类别 | 示例 |
+|:-----|:------|
+| 👤 **人名** | John Smith、张三、李四 |
+| 🌍 **地名** | London、California State、北京市 |
+| 🏢 **公司名及简称** | Apple Inc、阿里巴巴、Tencent |
+| 🏛️ **组织名及简称** | UN、WHO、世界卫生组织 |
+| 🔧 **产品/技术名** | iPhone 15、GPT-4、TensorFlow |
+| 📧 **其他 PII** | 邮箱地址、电话号码、日期时间 |
+
+---
+
+## ⚙️ 配置指南
+
+配置文件位于 [`config/config.py`](config/config.py)，核心参数：
+
+### LLM 配置
+
+```python
+# 选择模型服务
+CURRENT_LLM_SERVICE = "DEEPSEEK"  # OPENAI | DEEPSEEK | LOCAL
+
+# 模型温度（越低越稳定，建议 0.1-0.3）
+LLM_TEMPERATURE = 0.1
+```
+
+### 预处理参数
+
+```python
+BATCH_SIZE = 1000           # 每批次行数
+MIN_FIELD_LENGTH = 2        # 最小字段长度（过滤无效字段）
+```
+
+### 验证参数
+
+```python
+LOW_CONFIDENCE_THRESHOLD = 80    # 低置信度阈值（低于此值需人工复核）
+```
+
+---
+
+## 📁 项目结构
 
 ```
 SensFinder/
-├── config/              # 配置目录
-│   ├── config.py        # 主要配置文件
-│   └── prompt_template.txt # 提示词模板
-├── data/                # 数据目录
-│   ├── raw/             # 原始数据
-│   ├── batch/           # 批处理数据
-│   ├── classified/      # 分类结果
-│   └── problems/        # 问题字段
-├── logs/                # 日志目录
-├── script/              # 脚本目录
-│   ├── data_preprocess.py # 数据预处理
-│   ├── llm_classify.py   # LLM分类
-│   ├── result_verify.py  # 结果验证
-│   ├── sens_finder.py    # 主程序
-│   └── local_llm*.py     # 本地LLM客户端
-├── test/                # 测试目录
-├── requirements.txt     # 依赖列表
-└── README.md            # 项目文档
+├── config/                  # 配置目录
+│   ├── config.py            # 主要配置文件
+│   └── prompt_template.txt  # LLM 提示词模板
+├── data/                    # 数据目录
+│   ├── input_raw/           # 原始输入数据
+│   ├── preprocessed_batches/ # 预处理后的分片批次
+│   ├── classify_results/    # LLM 分类结果
+│   └── verify_problems/     # 验证出的问题字段
+├── script/                  # 核心脚本
+│   ├── sens_finder.py       # 主程序入口
+│   ├── data_preprocess.py   # 数据预处理
+│   ├── llm_classify.py      # LLM 分类
+│   ├── local_llm_client.py  # 本地 LLM 客户端
+│   └── result_verify.py     # 结果验证
+├── test/                    # 测试
+├── 产品设计PRD.md           # 产品需求文档
+├── 技术实现方案.md          # 技术方案文档
+├── requirements.txt         # Python 依赖
+└── README.md                # 💡 你在这里
 ```
 
-## 测试
+---
 
-运行测试脚本：
+## ❓ 常见问题
+
+<details>
+<summary><b>支持哪些 LLM 服务？</b></summary>
+目前支持 OpenAI（GPT-4o-mini/GPT-4o）、DeepSeek（deepseek-chat）以及任意兼容 OpenAI 接口格式的本地模型（如通过 Ollama/vLLM 部署的模型）。
+</details>
+
+<details>
+<summary><b>处理速度慢怎么办？</b></summary>
+1. 增大 `BATCH_SIZE`（注意不要超过 LLM 上下文限制）<br>
+2. 确认 LLM 服务的响应速度<br>
+3. 使用更快的模型（如 GPT-4o-mini 代替 GPT-4o）<br>
+4. 检查网络连接是否稳定
+</details>
+
+<details>
+<summary><b>如何提高分类准确率？</b></summary>
+1. 降低 `LLM_TEMPERATURE` 到 0.1 左右<br>
+2. 使用更强大的 LLM 模型<br>
+3. 在 `prompt_template.txt` 中添加更多分类示例<br>
+4. 适当降低 `LOW_CONFIDENCE_THRESHOLD` 扩大复核范围
+</details>
+
+<details>
+<summary><b>分类结果怎么用？</b></summary>
+输出为 CSV 格式，包含字段内容、分类结果、置信度和判断依据。可以直接用于：
+- 数据脱敏前的敏感字段标记
+- 合规审计的证据材料
+- 数据泄露风险评估报告
+</details>
+
+<details>
+<summary><b>API 密钥安全吗？</b></summary>
+API 密钥通过 `.env` 文件或 `config.py` 配置，项目已内置 `.gitignore`，确保密钥不会误提交到代码仓库。
+</details>
+
+---
+
+## 🧪 开发扩展
+
+### 添加新分类类型
+
+1. 修改 `config/prompt_template.txt`，添加新的分类定义和示例
+2. 在 `result_verify.py` 中添加相应的验证规则
+
+### 添加新 LLM 服务
+
+1. 在 `config/config.py` 中添加新服务的配置项
+2. 在 `llm_classify.py` 中添加对应的 API 调用逻辑
+
+### 添加新验证规则
+
+1. 在 `result_verify.py` 的 `verify_results()` 中新增验证逻辑
+2. 定义对应的问题类型和筛选条件
+
+---
+
+## 🧪 测试
+
 ```bash
 python test/test_sens_finder.py
 ```
 
-## 支持的信息类型
+---
 
-1. **人名**：自然人姓名
-2. **地名**：地理区域名称
-3. **公司名及简称**：企业名称
-4. **组织名及简称**：机构名称
-5. **产品/技术名**：产品或技术名称
-6. **邮箱地址**：电子邮件格式
-7. **电话号码**：电话号码格式
-8. **日期/时间**：日期时间信息
+## 🤝 贡献
 
-## 错误处理与日志
+欢迎任何形式的贡献——提交 Issue、Pull Request、改进文档或新增功能。
 
-系统采用多级日志记录，包括：
-- 文件日志：保存到`./logs`目录
-- 控制台日志：实时显示运行状态
+查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
 
-错误处理机制包括：
-- 自动重试（指数退避）
-- 异常捕获与记录
-- 详细的错误信息输出
+<a href="https://github.com/huajielong/SensFinder/graphs/contributors">
+  <img src="https://img.shields.io/badge/contributions-welcome-brightgreen" alt="Contributions Welcome"/>
+</a>
 
-## 性能优化
+## 📄 License
 
-- 批量处理：减少API调用次数
-- 并发控制：合理利用资源
-- 缓存机制：避免重复处理
+MIT © [huajielong](https://github.com/huajielong)
 
-## 注意事项
+---
 
-1. API密钥安全：请妥善保管API密钥，不要提交到代码仓库
-2. 输入数据：确保输入数据编码为UTF-8
-3. 性能调优：根据实际情况调整并发数和批次大小
-
-## License
-
-[MIT License](LICENSE)
-
-## 项目简介
-
-SensFinder是一款基于大语言模型(LLM)的自动化敏感信息识别与分类工具。它能够帮助用户快速发现和分类文本中的人名、地名、公司名和组织名等敏感信息，适用于数据脱敏前检查、数据泄露风险评估、合规性检查等场景。
-
-## 功能特点
-
-- **自动化识别**：使用LLM自动识别和分类敏感信息
-- **多LLM支持**：支持OpenAI、DeepSeek和自定义本地LLM服务
-- **灵活配置**：提供丰富的配置选项，适应不同需求
-- **并行处理**：采用多线程并行处理，提高处理效率
-- **结果验证**：自动检测低置信度结果和规则冲突
-- **清晰报告**：生成结构化的问题字段报告，便于人工复核
-
-## 系统架构
-
-项目采用模块化设计，包含四个主要组件：
-
-1. **主控制模块**：协调整个处理流程
-2. **数据预处理模块**：清洗和分批次处理原始数据
-3. **LLM分类模块**：调用LLM服务进行字段分类
-4. **结果验证模块**：验证分类结果并生成问题报告
-
-## 安装说明
-
-### 环境要求
-
-- Python 3.8 或更高版本
-- 所需Python库：pandas, openai, requests
-
-### 安装依赖
-
-#### 创建虚拟环境并安装依赖
-
-```bash
-# 检查并创建虚拟环境
-python -m venv venv
-
-# 激活虚拟环境并安装依赖
-venv\Scripts\Activate; pip install -r requirements.txt
-```
-
-#### 直接安装依赖（不使用虚拟环境）
-
-```bash
-pip install pandas openai requests
-```
-
-## 配置说明
-
-在使用前，需要修改`config/config.py`文件中的配置项：
-
-### 1. 路径配置
-
-```python
-# 原始文本文件目录路径（会递归处理目录下所有文件）
-RAW_FILES_PATH = os.path.join(PROJECT_ROOT, "data/input_raw/")
-# 预处理后分批次文件的保存路径
-BATCH_SAVE_PATH = os.path.join(PROJECT_ROOT, "data/preprocessed_batches/")
-# LLM分类结果保存路径
-CLASSIFY_SAVE_PATH = os.path.join(PROJECT_ROOT, "data/classify_results/")
-# 验证出的问题字段保存路径
-PROBLEM_SAVE_PATH = os.path.join(PROJECT_ROOT, "data/verify_problems/")
-```
-
-### 2. 预处理参数
-
-```python
-# 每批次行数（建议1000-2000，避免LLM上下文超量）
-BATCH_SIZE = 1000
-# 过滤无效字段：长度小于2的字段会被删除
-MIN_FIELD_LENGTH = 2
-```
-
-### 3. LLM配置
-
-```python
-# 选择当前使用的模型服务："OPENAI" 或 "DEEPSEEK" 或 "LOCAL"
-CURRENT_LLM_SERVICE = "DEEPSEEK"
-
-# LLM温度（0.1-0.3，越低结果越稳定）
-LLM_TEMPERATURE = 0.1
-
-# 根据选择的服务，配置相应的API密钥和模型信息
-# OpenAI配置
-OPENAI_API_KEY = "sk-你的OPENAI API Key"
-OPENAI_MODEL = "gpt-4o-mini"
-
-# DeepSeek配置
-DEEPSEEK_API_KEY = "sk-你的DeepSeek API Key"
-DEEPSEEK_BASE_URL = "https://api.deepseek.com"
-DEEPSEEK_MODEL = "deepseek-chat"
-
-# Local LLM配置
-LOCAL_LLM_URL = "http://localhost:8000/v1/chat/completions"
-LOCAL_LLM_MODEL = "你的本地模型名称"
-```
-
-### 4. 验证参数
-
-```python
-# 低置信度阈值（低于此值的字段需人工复核，建议80）
-LOW_CONFIDENCE_THRESHOLD = 80
-# 公司名关键词（用于规则冲突校验）
-COMPANY_KEYWORDS = ["Co., Ltd.", "Corp", "Inc", "LLC", "Group", "Company"]
-```
-
-## 使用方法
-
-### 1. 准备输入数据
-
-将需要分析的文本字段放入`data/input_raw/`目录下的文本文件中。支持以下格式：
-- 每行一个字段
-- 每行多个字段，使用空格分隔
-
-### 2. 运行完整流程
-
-执行主脚本，启动完整的处理流程：
-
-```bash
-python script/sens_finder.py
-```
-
-主脚本会按顺序执行以下操作：
-1. 数据预处理：清洗、去重、分批次
-2. LLM分类：调用配置的LLM服务进行分类
-3. 结果验证：检测问题字段并生成报告
-
-### 3. 单独运行各模块
-
-也可以单独运行各个模块进行调试或特定操作：
-
-- 数据预处理：
-  ```bash
-  python script/data_preprocess.py
-  ```
-
-- LLM分类：
-  ```bash
-  python script/llm_classify.py
-  ```
-
-- 结果验证：
-  ```bash
-  python script/result_verify.py
-  ```
-
-## 输出结果
-
-执行完成后，会在以下路径生成相应的结果文件：
-
-1. **预处理结果**：`data/preprocessed_batches/`
-   - 分批次的CSV文件，如`batch_1.csv`, `batch_2.csv`等
-
-2. **分类结果**：`data/classify_results/`
-   - 对应批次的分类结果，如`result_batch_1.csv`, `result_batch_2.csv`等
-   - 每个文件包含字段内容、分类结果、置信度和判断依据
-
-3. **问题报告**：`data/verify_problems/all_problems.csv`
-   - 汇总所有检测到的问题字段
-   - 包含源批次、原始文本、分类、置信度、判断依据和问题类型
-
-## 分类标准
-
-系统将字段分为以下几类：
-
-1. **人名**：自然人的完整姓名或常用名（如"John Smith"）
-2. **地名**：地理区域名称（如"London"、"California State"）
-3. **公司名及简称**：企业、商业机构的全称或简称（如"Apple Inc"）
-4. **组织名及简称**：非盈利组织、政府机构等（如"UN"、"WHO"）
-5. **未分类**：无法确定类别的字段
-
-## 常见问题与解决方案
-
-### 1. API调用失败
-
-- 检查API密钥是否正确配置
-- 确认网络连接是否正常
-- 验证LLM服务是否可访问
-- 查看日志中的具体错误信息
-
-### 2. 分类准确率不高
-
-- 调整LLM温度参数（降低到0.1左右）
-- 使用更高级的LLM模型
-- 更新提示词模板，提供更明确的分类规则
-
-### 3. 处理速度慢
-
-- 增加批次大小（但不要超过LLM上下文限制）
-- 优化线程池配置，增加线程数
-- 确保LLM服务响应速度快
-
-### 4. 内存占用过高
-
-- 减小批次大小
-- 降低并行线程数
-- 确保系统有足够的内存资源
-
-## 扩展开发
-
-### 添加新的分类类型
-
-1. 修改`config/prompt_template.txt`文件，添加新的分类定义和示例
-2. 如有需要，在`result_verify.py`中添加相应的验证规则
-
-### 添加新的LLM服务
-
-1. 在`config/config.py`中添加新服务的配置项
-2. 在`llm_classify.py`中添加对应的API调用逻辑
-
-### 添加新的验证规则
-
-1. 在`result_verify.py`的`verify_results()`函数中添加新的验证逻辑
-2. 定义相应的问题类型和筛选条件
-3. 将新的问题字段添加到汇总结果中
-
-## 注意事项
-
-1. 确保API密钥的安全性，不要将包含密钥的配置文件提交到版本控制系统
-2. 处理大量数据时，注意监控系统资源使用情况
-3. 定期更新公司关键词列表，以提高规则冲突检测的准确性
-4. 对于低置信度的分类结果，建议进行人工复核
-
-## 许可证
-
-[MIT License](LICENSE)
+<p align="center">
+  ⭐ 如果 SensFinder 对你有帮助，请点个 Star 支持一下！
+</p>
