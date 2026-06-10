@@ -20,6 +20,9 @@
   <a href="#-configuration">⚙️ Config</a> •
   <a href="#-faq">❓ FAQ</a>
 </p>
+
+> [中文说明](README.zh.md)
+
 
 ---
 
@@ -281,6 +284,4 @@ MIT © [huajielong](https://github.com/huajielong)
 
 <p align="center">
   ⭐ Star SensFinder if it helps you protect your data!
-</p>
-
-> [中文说明](README.zh.md)
+</p>
